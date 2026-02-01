@@ -24,13 +24,14 @@ jobs:
           compiler: clang-latest
       - name: Install Rust Toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
-      - uses: tree-sitter/setup-action@v1
+      - name: Install tree-sitter
+        uses: tree-sitter/setup-action@v2
       - name: Install Lua
         uses: leso-kn/gh-actions-lua@master
         with:
           luaVersion: "5.1"
       - name: Install Luarocks
-        uses: hishamhm/gh-actions-luarocks@master
+        uses: luarocks/gh-actions-luarocks@master
       - uses: rhysd/action-setup-vim@v1
         with:
           neovim: true
