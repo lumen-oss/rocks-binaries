@@ -3,7 +3,7 @@ name: Build win32-x86_64 dependencies
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Build macosx-x86_64 dependencies"]
+    workflows: ["Build macosx-aarch64 dependencies"]
     branches: [main]
     types: 
       - completed
