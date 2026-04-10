@@ -52,8 +52,10 @@ jobs:
           ABI_VERSION="$(nvim -u NORC -c 'lua print(vim.treesitter.language_version)' --headless +q 2>&1)"
           echo "TREE_SITTER_LANGUAGE_VERSION=$ABI_VERSION" >> $GITHUB_ENV
 
-      - name: Install libiconv # for toml-edit
-        run: brew install libiconv
+      - name: Install and fix libiconv # for toml-edit
+        run: |
+          brew install libiconv
+          export LIBRARY_PATH=$LIBRARY_PATH:$(brew --prefix)/lib:$(brew --prefix)/opt/libiconv/lib
         
       - name: Print environment
         run: |
