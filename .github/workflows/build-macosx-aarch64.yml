@@ -71,6 +71,12 @@ jobs:
       - name: Install `toml-edit` Package
         if: always()
         run: ./scripts/pack_binary_rock.lua toml-edit macosx-aarch64
+      - name: Install `lux-lua` Package
+        if: always()
+        run: ./scripts/pack_binary_rock.lua lux-lua macosx-aarch64
+      - name: Install `lux-lsp` Package
+        if: always()
+        run: ./scripts/pack_binary_rock.lua lux-lsp macosx-aarch64
       - name: Install `fzy` Package
         if: always()
         run: ./scripts/pack_binary_rock.lua fzy macosx-aarch64
