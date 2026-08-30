@@ -102,3 +102,29 @@ if sc.code ~= 0 then
   print(sc.stderr and "STDERR:\n" .. sc.stderr)
   error("luarocks pack failed!")
 end
+
+local function version_from_rock_name(filename)
+  local stem = filename:match("^(.*)%.rock$") or filename
+  stem = stem:match("^(.*)%." .. vim.pesc(arch) .. "$")
+    or stem:match("^(.*)%.all$")
+    or stem
+  local version_str = stem:match("^" .. vim.pesc(rock_name) .. "%-(.+)$")
+  if not version_str then
+    return nil
+  end
+  version_str = version_str:match("^(.-)%-%d+$") or version_str
+  local ok, version = pcall(vim.version.parse, version_str)
+  if ok then
+    return version
+  end
+end
+
+vim.iter(vim.fn.glob(rock_name .. "-*.rock", false, true))
+  :filter(function(filename)
+    local version = version_from_rock_name(vim.fs.basename(filename))
+    return version and not vim.version.eq(version, latest_version)
+  end)
+  :each(function(filename)
+    print("Removing " .. filename)
+    vim.uv.fs_unlink(filename)
+  end)
