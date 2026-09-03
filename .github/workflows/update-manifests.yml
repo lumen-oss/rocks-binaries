@@ -1,0 +1,31 @@
+name: Update manifests
+
+on:
+  workflow_run:
+    workflows: ["Build win32-x86_64 dependencies"]
+    branches: [main]
+    types:
+      - completed
+  workflow_dispatch:
+
+concurrency:
+  group: update-manifests
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - name: Install Luarocks
+        uses: luarocks/gh-actions-luarocks@master
+      - name: Regenerate Manifests and HTML
+        run: luarocks-admin make-manifest --lua-version=5.1 .
+      - name: Commit manifests
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update manifests"
+          file_pattern: "manifest* index.html"
