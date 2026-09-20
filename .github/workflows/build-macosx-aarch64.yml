@@ -64,7 +64,7 @@ jobs:
         if: always()
         run: |
           luarocks --local --lua-version=5.1 install luarocks-build-rust-mlua
-          luarocks pack luarocks-build-rust-mlua
+          luarocks --local --lua-version=5.1 pack luarocks-build-rust-mlua
       - name: Install TOML Package
         if: always()
         run: ./scripts/pack_binary_rock.lua toml macosx-aarch64
