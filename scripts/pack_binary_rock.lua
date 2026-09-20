@@ -93,7 +93,7 @@ else
     error("luarocks install failed!")
   end
 
-  sc = vim.system({ luarocks_cmd, "pack", rock_name}):wait()
+  sc = vim.system({ luarocks_cmd, "--local", "--lua-version=5.1", "pack", rock_name}):wait()
 
   if sc.code ~= 0 then
     print(sc.stdout and "STDOUT:\n" .. sc.stdout)
