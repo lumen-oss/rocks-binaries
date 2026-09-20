@@ -84,23 +84,22 @@ Latest packed version: %s
 
 if latest_packed_version and latest_packed_version >= latest_version then
   print("Nothing to do.")
-  return
-end
+else
+  sc = vim.system({ luarocks_cmd, "--local", "--lua-version=5.1", "install", rock_name, latest_version}):wait()
 
-sc = vim.system({ luarocks_cmd, "--local", "--lua-version=5.1", "install", rock_name, latest_version}):wait()
+  if sc.code ~= 0 then
+    print(sc.stdout and "STDOUT:\n" .. sc.stdout)
+    print(sc.stderr and "STDERR:\n" .. sc.stderr)
+    error("luarocks install failed!")
+  end
 
-if sc.code ~= 0 then
-  print(sc.stdout and "STDOUT:\n" .. sc.stdout)
-  print(sc.stderr and "STDERR:\n" .. sc.stderr)
-  error("luarocks install failed!")
-end
+  sc = vim.system({ luarocks_cmd, "pack", rock_name}):wait()
 
-sc = vim.system({ luarocks_cmd, "pack", rock_name}):wait()
-
-if sc.code ~= 0 then
-  print(sc.stdout and "STDOUT:\n" .. sc.stdout)
-  print(sc.stderr and "STDERR:\n" .. sc.stderr)
-  error("luarocks pack failed!")
+  if sc.code ~= 0 then
+    print(sc.stdout and "STDOUT:\n" .. sc.stdout)
+    print(sc.stderr and "STDERR:\n" .. sc.stderr)
+    error("luarocks pack failed!")
+  end
 end
 
 local function version_from_rock_name(filename)
@@ -119,12 +118,21 @@ local function version_from_rock_name(filename)
   end
 end
 
-vim.iter(vim.fn.glob(rock_name .. "-*.rock", false, true))
-  :filter(function(filename)
-    local version = version_from_rock_name(vim.fs.basename(filename))
-    return version and not vim.version.eq(version, latest_version)
+-- Keep the N latest versions for this arch; never touch other architectures'
+-- rocks (this used to delete e.g. committed macosx rocks on the linux runner).
+local max_versions = 3
+local rocks = vim.iter(vim.fn.glob(rock_name .. "-*." .. arch .. ".rock", false, true))
+  :map(function(filename)
+    return { filename = filename, version = version_from_rock_name(vim.fs.basename(filename)) }
   end)
-  :each(function(filename)
-    print("Removing " .. filename)
-    vim.uv.fs_unlink(filename)
+  :filter(function(rock)
+    return rock.version ~= nil
   end)
+  :totable()
+table.sort(rocks, function(a, b)
+  return a.version > b.version
+end)
+for i = max_versions + 1, #rocks do
+  print("Removing " .. rocks[i].filename)
+  vim.uv.fs_unlink(rocks[i].filename)
+end
