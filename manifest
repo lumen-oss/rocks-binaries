@@ -120,14 +120,6 @@ repository = {
       }
    },
    ["lux-lua"] = {
-      ["0.50.0-1"] = {
-         {
-            arch = "linux-x86_64"
-         },
-         {
-            arch = "macosx-aarch64"
-         }
-      },
       ["0.51.0-1"] = {
          {
             arch = "linux-x86_64"
@@ -137,6 +129,14 @@ repository = {
          }
       },
       ["0.52.2-1"] = {
+         {
+            arch = "linux-x86_64"
+         },
+         {
+            arch = "macosx-aarch64"
+         }
+      },
+      ["0.53.0-1"] = {
          {
             arch = "linux-x86_64"
          },
